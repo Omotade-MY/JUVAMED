@@ -13,6 +13,9 @@ if not st.session_state.get('info_status',''):
     
 
 def onclick():
+    st.success("Information has be stored")
+    with st.spinner("We are setting your schedule with AI Doctor"):
+        time.sleep(3)
     st.session_state['info_status'] = True
 
 def main():
@@ -75,9 +78,6 @@ def main():
 
 print(st.session_state['info_status'])
 if st.session_state['info_status']:
-    st.success("Information has be stored")
-    with st.spinner("We are setting your schedule with AI Doctor"):
-        time.sleep(3)
     # Chat Interface
     st.write("# Consultation Session")
     user_input = st.chat_input("Ask JUVA MED Something")
