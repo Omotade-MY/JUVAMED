@@ -10,53 +10,67 @@ We hope our AI doctor can diagnose your ailment and assist you with your medical
 
 if not st.session_state.get('info_status',''):
     st.session_state['info_status'] = False
+    
+
+def onclick():
+    st.session_state['info_status'] = True
 
 def main():
     
-
-    # Sidebar with Upload File options
-    with st.sidebar:
-        st.write("# Upload Files")
-        imaging_files = st.file_uploader("Choose Image files to upload", type=["jpg", "jpeg", "png"],
-                                         )
-        medical_record = st.file_uploader("Choose Medical record to upload", type=["pdf"])
-
-    # Form on the main page
     container  = st.empty()
-    with container.form("# Patient Information") as cont:
-        st.write("# Patient Information")
-        age = st.number_input("Age", value=25, step=1)
-        marital_status = st.radio("Marital Status", options=["Single", "Married", "Divorced", "Widowed"])
-        gender = st.radio("Gender", options=["Male", "Female", "Other"])
-        smoke = st.checkbox("Smoke?")
-        drink = st.checkbox("Drink?")
-        exercises = st.checkbox("Exercises?")
-        other_info = st.text_area("Other Information")
-        submitted = st.form_submit_button("Submit")
-    if submitted:
-        st.session_state['info_status'] = True
+    if not st.session_state.get('submitted', ''):
+        # Sidebar with Upload File options
+        with st.sidebar:
+            st.write("# Upload Files")
+            st.session_state.imaging_files = st.file_uploader("Choose Image files to upload", type=["jpg", "jpeg", "png"],
+                                            )
+            st.session_state.medical_record = st.file_uploader("Choose Medical record to upload", type=["pdf"])
+
+        # Form on the main page
+        
+        with container.form("# Patient Information") as cont:
+            st.write("# Patient Information")
+            st.session_state.age = st.number_input("Age", value=25, step=1)
+            st.session_state.marital_status = st.radio("Marital Status", options=["Single", "Married", "Divorced", "Widowed"])
+            st.session_state.gender = st.radio("Gender", options=["Male", "Female", "Other"])
+            st.session_state.smoke = st.checkbox("Smoke?")
+            st.session_state.drink = st.checkbox("Drink?")
+            st.session_state.exercises = st.checkbox("Exercises?")
+            st.session_state.other_info = st.text_area("Other Information")
+            submitted = st.form_submit_button("Submit")
+            st.session_state['submitted'] = submitted
+
+    if st.session_state['submitted']:
+        st.session_state['submitted'] = True
         container.empty()
         # Process data
+        st.session_state['info_status'] = True
         # Placeholder: This is where you would process the form data and uploaded files, e.g., send to backend
-        st.write("Processing Data...")
         st.write("Data Received: ")
-        st.write(f"Age: {age}, Marital Status: {marital_status}, Gender: {gender}")
-        st.write(f"Smoke: {smoke}, Drink: {drink}, Exercises: {exercises}")
-        st.write(f"Other Info: {other_info}")
-        if imaging_files:
+        st.write(f"Age: {st.session_state.age}")
+        st.write(f"Marital Status: {st.session_state.marital_status}")
+        st.write(f"Gender: {st.session_state.gender}")
+        st.write(f"Smoke: {st.session_state.smoke}")
+        st.write(f"Drink: {st.session_state.drink}")
+        st.write(f"Exercises: {st.session_state.exercises}")
+        st.write(f"Other Info: {st.session_state.other_info}")
+        if st.session_state.imaging_files:
             st.write("Uploaded Files:")
             #for file in imaging_files:
                 #img = file.read()
-            st.image(imaging_files)
+            st.image(st.session_state.imaging_files)
         
-        if medical_record:
+        if st.session_state.medical_record:
             st.write("Uploaded Files:")
             #for file in medical_record:
-            st.write(medical_record.name)
-    st.markdown("#### Please confirm the above Information!!")
-    if st.button("Confirm"):
-        st.session_state['info_status'] = True
-            
+            st.write(st.session_state.medical_record.name)
+
+            st.markdown("#### Please confirm the above Information!!")
+
+        if not st.button("Confirm", on_click=onclick):
+            st.session_state['info_status'] = False
+            pass
+                
             
 
 print(st.session_state['info_status'])
