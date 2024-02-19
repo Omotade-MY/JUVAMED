@@ -22,7 +22,7 @@ def chat_with_autogon(session_id, question, autogon_api):
         return f"Error: {response.status_code} - {response.text}"
 
 # Example usage:
-session_id = "9a2a3752-182c-469c-bed5-b9a3d3adfa05"
+session_id = "36d37fe0-8efd-4deb-9bc7-d873fefdaf52"
 
 question = "list what you know?"
 
