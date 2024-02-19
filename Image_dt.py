@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def generate_medical_description(user_prompt, image_url):
-    GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
+    GOOGLE_API_KEY = "AIzaSyAfSMYWXQP9jenHCH0_V0vHd3-d07h8ODk" #os.environ['GOOGLE_API_KEY']
     llm = ChatGoogleGenerativeAI(model="gemini-pro-vision", google_api_key=GOOGLE_API_KEY)
 
     # Base prompt for the model to take the role of a doctor describing a medical image
@@ -44,7 +44,7 @@ def generate_medical_description(user_prompt, image_url):
 
 
 
-user_prompt = "Please describe the symptoms or relevant details about the medical image."
-image_url = r'C:\Users\Whaleeu\Downloads\images (1).jpeg'
-result = generate_medical_description(user_prompt, image_url)
-result
+#user_prompt = "Please describe the symptoms or relevant details about the medical image."
+#image_url = r'./images/Normal-CT-head-5Age-30-40.jpg'
+#result = generate_medical_description(user_prompt, image_url)
+#result
