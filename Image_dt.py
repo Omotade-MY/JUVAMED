@@ -1,9 +1,12 @@
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 import time
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 def generate_medical_description(user_prompt, image_url):
-    GOOGLE_API_KEY = "AIzaSyCsFB_-DklkKsy1g0zBI9hCstYvfpIK0VU"
+    GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY']
     llm = ChatGoogleGenerativeAI(model="gemini-pro-vision", google_api_key=GOOGLE_API_KEY)
 
     # Base prompt for the model to take the role of a doctor describing a medical image

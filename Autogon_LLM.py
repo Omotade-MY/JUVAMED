@@ -21,17 +21,12 @@ def chat_with_autogon(session_id, question, autogon_api):
     else:
         return f"Error: {response.status_code} - {response.text}"
 
-
-
 # Example usage:
 session_id = "9a2a3752-182c-469c-bed5-b9a3d3adfa05"
-autogon_api_key = "PeD31Dan.kExR4DWsrU7sUTWSApAhbGVJCEwOVnsI"
-
-
 
 question = "list what you know?"
 
 
 
-result = chat_with_autogon(session_id, question, autogon_api_key)
-print("Chatbot response:", result)
+#result = chat_with_autogon(session_id, question, autogon_api_key)
+#print("Chatbot response:", result)

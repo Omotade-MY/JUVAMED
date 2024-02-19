@@ -1,6 +1,15 @@
 import streamlit as st
 import time
+import os
+from dotenv import load_dotenv
+from util import init_messages
+from Autogon_LLM import chat_with_autogon, session_id
+load_dotenv()
 
+autogon_api_key = os.environ['AUTOGON_API_KEY_2']
+
+st.set_page_config(
+    )
 # Welcome Message
 st.markdown("""
 # Welcome to JUVA MED
@@ -80,10 +89,20 @@ print(st.session_state['info_status'])
 if st.session_state['info_status']:
     # Chat Interface
     st.write("# Consultation Session")
+    init_messages()
+    for msg in st.session_state.messages:
+        st.chat_message(msg["role"]).write(msg["content"])
+
     user_input = st.chat_input("Ask JUVA MED Something")
     # Placeholder: This is where you would integrate with your AI Doctor model to provide responses
     if user_input:
-        ai_response = "JUVA MED is at your service"
-        st.write(f"AI Response: {ai_response}")
+        st.chat_message("user").write(user_input)
+        st.session_state.messages.append({"role": "user", "content": user_input})
+
+        response = chat_with_autogon(session_id, user_input, autogon_api_key)
+        #ai_response = "JUVA MED is at your service"
+        st.chat_message("assistant").write(response)
+        st.session_state.messages.append({"role": "assistant", "content": response})
+
 else:
     main()
