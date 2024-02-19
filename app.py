@@ -1,6 +1,19 @@
 import streamlit as st
 import time
+import os
+from dotenv import load_dotenv
+from util import init_messages, load_image
+from Autogon_LLM import chat_with_autogon, session_id
+from Image_dt import generate_medical_description
 
+load_dotenv()
+
+user_prompt = "Please describe the symptoms or relevant details about the medical image."
+
+autogon_api_key = os.environ['AUTOGON_API_KEY']
+
+st.set_page_config(
+    )
 # Welcome Message
 st.markdown("""
 # Welcome to JUVA MED
@@ -25,7 +38,7 @@ def main():
         # Sidebar with Upload File options
         with st.sidebar:
             st.write("# Upload Files")
-            st.session_state.imaging_files = st.file_uploader("Choose Image files to upload", type=["jpg", "jpeg", "png"],
+            st.session_state.imaging_file = st.file_uploader("Choose Image files to upload", type=["jpg", "jpeg", "png"],
                                             )
             st.session_state.medical_record = st.file_uploader("Choose Medical record to upload", type=["pdf"])
 
@@ -57,11 +70,11 @@ def main():
         st.write(f"Drink: {st.session_state.drink}")
         st.write(f"Exercises: {st.session_state.exercises}")
         st.write(f"Other Info: {st.session_state.other_info}")
-        if st.session_state.imaging_files:
-            st.write("Uploaded Files:")
+        if st.session_state.imaging_file:
+            st.write("Uploaded Images:")
             #for file in imaging_files:
                 #img = file.read()
-            st.image(st.session_state.imaging_files)
+            st.image(st.session_state.imaging_file)
         
         if st.session_state.medical_record:
             st.write("Uploaded Files:")
@@ -79,11 +92,35 @@ def main():
 print(st.session_state['info_status'])
 if st.session_state['info_status']:
     # Chat Interface
+    if ('image_analysis' not in st.session_state) and ('imaging_file' in st.session_state):
+        image_url = load_image(st.session_state.imaging_file)
+        result = generate_medical_description(user_prompt, image_url)
+        st.write("Image Description: "+ result.content)
+        st.session_state['image_analysis'] = result.content
+        st.session_state.base_prompt = """Below is the analysis of the user's medical scan. Kindly give a medical advice based on this. \nNote: Your new task is to assume a medical role\n\n
+                            Medical Scan Description: {}
+
+                            Question: {}
+
+                            Try as much as you can to provide relevant answer and help this patient. 
+                            """
+
     st.write("# Consultation Session")
-    user_input = st.chat_input("Ask JUVA MED Something")
+    init_messages()
+    for msg in st.session_state.messages:
+        st.chat_message(msg["role"]).write(msg["content"])
+
+    user_input = st.chat_input("Ask JUVA MED")
     # Placeholder: This is where you would integrate with your AI Doctor model to provide responses
     if user_input:
-        ai_response = "JUVA MED is at your service"
-        st.write(f"AI Response: {ai_response}")
+        final_input = st.session_state.base_prompt.format(st.session_state.image_analysis,user_input)
+        st.chat_message("user").write(user_input)
+        st.session_state.messages.append({"role": "user", "content": user_input})
+
+        response = chat_with_autogon(session_id, final_input, autogon_api_key)
+        #ai_response = "JUVA MED is at your service"
+        st.chat_message("assistant").write(response)
+        st.session_state.messages.append({"role": "assistant", "content": response})
+
 else:
     main()
