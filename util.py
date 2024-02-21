@@ -77,6 +77,8 @@ def get_xray_scan(inp=None):
 def ask_user(query):
     #res = input(f"{query}: ")
     st.chat_message('assistant').write(query)
+    st.session_state.messages.append({"role": "assistant", "content": query})
+
     st.stop()
     return #res
 
