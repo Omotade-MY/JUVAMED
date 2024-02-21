@@ -142,10 +142,13 @@ if st.session_state['info_status']:
         st.session_state.messages.append({"role": "user", "content": user_input})
 
         #response = chat_with_autogon(session_id, final_input, autogon_api_key)
-        response = agent_executor.invoke({'input':st.session_state.messages})
-        #ai_response = "JUVA MED is at your service"
-        st.chat_message("assistant").write(response['output'])
-        st.session_state.messages.append({"role": "assistant", "content": response['output']})
+        try:
+            response = agent_executor.invoke({'input':st.session_state.messages})
+            #ai_response = "JUVA MED is at your service"
+            st.chat_message("assistant").write(response['output'])
+            st.session_state.messages.append({"role": "assistant", "content": response['output']})
+        except Exception as err:
+            st.error("Oops! Error Occured, when generating response!!")
 
 else:
     main()
