@@ -1,2 +1,6 @@
 streamlit
 langchain_core
+python-dotenv
+langchain_google_genai
+langchain_experimental
+langchain
