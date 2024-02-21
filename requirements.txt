@@ -4,3 +4,4 @@ python-dotenv
 langchain_google_genai
 langchain_experimental
 langchain
+langchainhub
