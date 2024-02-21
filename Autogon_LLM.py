@@ -1,5 +1,8 @@
 import requests
 import json
+import os
+from dotenv import load_dotenv
+import streamlit as st
 
 def chat_with_autogon(session_id, question, autogon_api):
     url = "https://api.autogon.ai/api/v1/services/chatbot/e71fcd98-b129-4145-980b-1c14b2f991c5/chat/"
@@ -20,9 +23,10 @@ def chat_with_autogon(session_id, question, autogon_api):
         return response.json()["data"]["bot_response"]
     else:
         return f"Error: {response.status_code} - {response.text}"
-
+load_dotenv()
 # Example usage:
-session_id = "36d37fe0-8efd-4deb-9bc7-d873fefdaf52"
+session_id = st.secrets['session_id']
+#session_id = os.environ['session_id']
 
 question = "list what you know?"
 
