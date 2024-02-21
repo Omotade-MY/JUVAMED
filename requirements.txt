@@ -1,1 +1,8 @@
 streamlit
+requests
+json
+langchain_core.messages
+langchain_google_genai 
+time
+
+

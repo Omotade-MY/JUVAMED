@@ -27,6 +27,5 @@ session_id = "36d37fe0-8efd-4deb-9bc7-d873fefdaf52"
 question = "list what you know?"
 
 
-
 #result = chat_with_autogon(session_id, question, autogon_api_key)
 #print("Chatbot response:", result)

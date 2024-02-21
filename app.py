@@ -10,7 +10,7 @@ load_dotenv()
 
 user_prompt = "Please describe the symptoms or relevant details about the medical image."
 
-autogon_api_key = os.environ['AUTOGON_API_KEY']
+#autogon_api_key = "5yDUI8MA.9Sg5UHCNTXlmupUFxX6xSPzymo837tXG" #os.environ['AUTOGON_API_KEY']
 
 st.set_page_config(
     )
