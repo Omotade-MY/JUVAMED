@@ -18,9 +18,6 @@ load_dotenv()
 
 user_prompt = "Please describe the symptoms or relevant details about the medical image."
 
-<<<<<<< HEAD
-#autogon_api_key = "5yDUI8MA.9Sg5UHCNTXlmupUFxX6xSPzymo837tXG" #os.environ['AUTOGON_API_KEY']
-=======
 autogon_api_key = st.secrets['AUTOGON_API_KEY']
 #autogon_api_key = os.environ['AUTOGON_API_KEY']
 if not st.session_state.get('image_analysis'):
@@ -29,7 +26,6 @@ if not st.session_state.get('image_analysis'):
 if not st.session_state.get('images'):
     st.session_state['images'] = []
 
->>>>>>> c84ed9242a21f8ad4647d2d9ed829e9cc2a28070
 
 st.set_page_config(
     )
