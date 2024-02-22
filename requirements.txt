@@ -1,4 +1,5 @@
 streamlit
+<<<<<<< HEAD
 requests
 json
 langchain_core.messages
@@ -6,3 +7,11 @@ langchain_google_genai
 time
 
 
+=======
+langchain_core
+python-dotenv
+langchain_google_genai
+langchain_experimental
+langchain
+langchainhub
+>>>>>>> a2032295fe9c377f36de9a0c3f3b5276a17a51bb
