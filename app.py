@@ -2,7 +2,7 @@ import streamlit as st
 import time
 import os
 from dotenv import load_dotenv
-from util import init_messages, load_image, update_image_analysis
+from util import init_messages, load_image, update_image_analysis, update_images
 from Autogon_LLM import chat_with_autogon, session_id
 from Image_dt import generate_medical_description
 from langchain.agents.react.agent import create_react_agent
@@ -22,6 +22,9 @@ autogon_api_key = st.secrets['AUTOGON_API_KEY']
 #autogon_api_key = os.environ['AUTOGON_API_KEY']
 if not st.session_state.get('image_analysis'):
     st.session_state['image_analysis'] = {}
+
+if not st.session_state.get('images'):
+    st.session_state['images'] = []
 
 
 st.set_page_config(
@@ -118,6 +121,7 @@ if st.session_state['info_status']:
     # Chat Interface
     if (not st.session_state.image_analysis) and (st.session_state.imaging_file):
         image_url = load_image(st.session_state.imaging_file)
+        update_images(image_url)
         result = generate_medical_description(user_prompt, image_url)
         #st.write("Image Description: "+ result.content)
         update_image_analysis(result.content)
@@ -143,6 +147,7 @@ if st.session_state['info_status']:
         st.session_state.new_file = st.sidebar.file_uploader("Choose Image files to upload", type=["jpg", "jpeg", "png"] )
         if st.session_state.new_file:
             img =  load_image(st.session_state.new_file)
+            update_images(img)
             with st.spinner("JuvaMed is Analysing Image"):
                 res  = generate_medical_description(user_prompt, img)
                 st.session_state.new_img_desc = res.content
@@ -150,6 +155,8 @@ if st.session_state['info_status']:
                 st.session_state['get_new_img'] = False
         else:
             st.stop()
+    for img in st.session_state['images']:
+        st.sidebar.image(img)
     user_input = st.chat_input("Consult JUVA MED")
     # Placeholder: This is where you would integrate with your AI Doctor model to provide responses
     if user_input:
