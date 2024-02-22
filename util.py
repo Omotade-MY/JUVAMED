@@ -9,6 +9,7 @@ from langchain.agents import AgentExecutor
 from langchain.agents import AgentType, initialize_agent, load_tools
 from langchain.agents import tools, Tool, tool
 
+
 prompt = hub.pull("hwchase17/react")
 base_template = prompt.template
 
@@ -17,11 +18,11 @@ prompt.template = """"I'm JUVAMED, an AI expert in radiology and general medicin
 When providing a diagnosis and medical advice, keep to these template:
 
 1. Think about the symptoms and what information you need.
-2. If there is need for additional information then you should ask the user. 
-2. Provide a probabilistic response, indicating the likelihood of the medical condition.
-3. Offer specific medical advice, outlining recommended next steps for the user/patient to follow.
-4. Give a concluisve diagnoses and recommend possible treatment.
-
+2. If there is need for additional information then you should ask the user. As a radiologist it is important you ask the user to provide a medical image if they have not provided any.
+3. Provide a probabilistic response, indicating the likelihood of the medical condition.
+4. Offer specific medical advice, outlining recommended next steps for the user/patient to follow.
+5. Give a concluisve diagnoses and recommend possible treatment.
+6. You must always try to get the information from the user even when they reply with subjective responses or personal opinions.
 To ensure an accurate and safe diagnosis, you may request additional information from the user.\n
 You should only use a tool if it is needed""" + base_template
 
@@ -31,6 +32,9 @@ def init_messages(add_msg='') -> None:
     if clear_button or "messages" not in st.session_state:
         st.session_state["messages"] = [{"role": "assistant", 
                                          "content": "Welcome to JUVA MED!! Start by explaining your ailment?"}]
+        #if st.session_state.get('image_analysis'):
+        #    st.session_state.messages.append({"role": "assistant", "content": 'You have provided a medical scan\n'+st.session_state['image_analysis']})
+       
  
 @st.cache_data
 def load_image(uploaded_file):
@@ -38,42 +42,24 @@ def load_image(uploaded_file):
     img = Image.open(BytesIO(image_data))
     return img
 
-def get_ct_scan(inp=None):
+def get_medical_scans(inp=None):
     
-    #user_prompt = "Please describe the symptoms or relevant details about the medical image."
-    #image_url = r'./images/Normal-CT-head-5Age-30-40.jpg'
-    #result = generate_medical_description(user_prompt, image_url)
-    #print("Image Description", result.content)
-    content = """Image Description  The image is a CT scan of the head. It shows a large area of low density in the right frontal lobe of the brain. This is likely caused by a contusion, which is a bruise of the brain tissue. The contusion is probably the result of a traumatic brain injury, such as a car accident or a fall.
-
-            The patient may have a headache, nausea, vomiting, and confusion. They may also have difficulty speaking or moving their right arm or leg.
-
-            The treatment for a contusion is typically supportive. The patient may be given pain medication and anti-inflammatory drugs. They may also need to have surgery to remove the contusion if it is causing significant problems.
-
-            The prognosis for a contusion depends on the size and location of the injury. Most contusions heal completely, but some patients may have permanent problems, such as memory loss or difficulty speaking."""
+    
+    content = st.session_state['image_analysis']
+    
     return content
 
-def get_xray_scan(inp=None):
-    
-    #user_prompt = "Please describe the symptoms or relevant details about the medical image."
-    #image_url = r'./images/Normal-CT-head-5Age-30-40.jpg'
-    #result = generate_medical_description(user_prompt, image_url)
-    #print("Image Description", result.content)
-    content = """Image Description  The provided image is an X-ray of a hand. The bones are in the correct alignment, and there are no signs of fracture or dislocation. However, the soft tissues around the bones appear swollen. This could be due to a number of things, including inflammation, infection, or trauma.
+def get_new_medical_image(query):
 
-            The patient may be experiencing pain, swelling, and stiffness in the hand. They may also have difficulty moving the fingers. If the swelling is severe, it could compress the nerves and blood vessels in the hand, leading to further problems.
-
-            The differential diagnosis for this condition includes a number of things, including:
-
-            * Arthritis
-            * Gout
-            * Infection
-            * Trauma
-            * Tumor
-
-            The patient should be evaluated by a doctor to determine the cause of the swelling and to receive appropriate treatment."""
-    return "No Xray Image"#content
-
+    st.chat_message('assistant').write(query+"\n\nUpload you medical image on the left sidebar") 
+    st.session_state.messages.append({"role": "assistant", "content": query})
+           
+    st.session_state['get_new_img'] = True
+    if st.session_state.get('new_img_desc'):
+        return st.session_state.new_img_desc
+    else:
+        st.rerun()
+        
 def ask_user(query):
     #res = input(f"{query}: ")
     st.chat_message('assistant').write(query)
@@ -82,6 +68,13 @@ def ask_user(query):
     st.stop()
     return #res
 
+def respond_to_user(query):
+    #res = input(f"{query}: ")
+    st.chat_message('assistant').write(query)
+    st.session_state.messages.append({"role": "assistant", "content": query})
+
+    st.stop()
+    return #res
 def user_biodata(input=None):
     biodata = f"""t.write("Patient Bio Data")
         Age: {st.session_state.age}\n
@@ -99,14 +92,14 @@ def user_biodata(input=None):
 
 tools = [
     Tool.from_function(         
-                                get_ct_scan,
-                                name= 'ct_image_description',
-                                description = "Useful for extracting the user medical CT scan"
+                                get_medical_scans,
+                                name= 'medical_all_user_image_descriptions',
+                                description = "Use this to access all the medical images the user has provided, This is needed for knowing the user's medical history and other symptoms. Always refer to this before asking the user further questions."
                 ),
     Tool.from_function(         
-                                get_xray_scan,
-                                name= 'xray_image_description',
-                                description = "Useful for extracting the user medical xray scan."
+                                get_new_medical_image,
+                                name= 'collect_new_medical_image',
+                                description = "Use this to request for new medical image from user. Refer to this tool if you want to access the medical image you've requested from the user."
                 ),
     
     Tool.from_function(         
@@ -121,3 +114,7 @@ tools = [
                 ),
     
 ]
+
+def update_image_analysis(img_desc):
+    no = len(st.session_state['image_analysis'])
+    st.session_state['image_analysis'].update({f'image_description{no+1}': img_desc})

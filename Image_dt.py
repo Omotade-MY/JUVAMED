@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def generate_medical_description(user_prompt, image_url):
-    GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY_3'] #
+    GOOGLE_API_KEY = st.secrets['GOOGLE_API_KEY'] #
     #GOOGLE_API_KEY = os.environ['GOOGLE_API_KEY_3']
     llm = ChatGoogleGenerativeAI(model="gemini-pro-vision", google_api_key=GOOGLE_API_KEY)
 

@@ -2,12 +2,13 @@ import streamlit as st
 import time
 import os
 from dotenv import load_dotenv
-from util import init_messages, load_image
+from util import init_messages, load_image, update_image_analysis
 from Autogon_LLM import chat_with_autogon, session_id
 from Image_dt import generate_medical_description
 from langchain.agents.react.agent import create_react_agent
 from langchain.agents import AgentExecutor
 from langchain_google_genai import ChatGoogleGenerativeAI
+
 
 from util import tools, prompt, base_template
 
@@ -19,7 +20,8 @@ user_prompt = "Please describe the symptoms or relevant details about the medica
 
 autogon_api_key = st.secrets['AUTOGON_API_KEY']
 #autogon_api_key = os.environ['AUTOGON_API_KEY']
-
+if not st.session_state.get('image_analysis'):
+    st.session_state['image_analysis'] = {}
 
 
 st.set_page_config(
@@ -114,11 +116,12 @@ if st.session_state['info_status']:
     agent = create_react_agent(llm, tools, prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
     # Chat Interface
-    if ('image_analysis' not in st.session_state) and ('imaging_file' in st.session_state):
+    if (not st.session_state.image_analysis) and (st.session_state.imaging_file):
         image_url = load_image(st.session_state.imaging_file)
         result = generate_medical_description(user_prompt, image_url)
         #st.write("Image Description: "+ result.content)
-        st.session_state['image_analysis'] = result.content
+        update_image_analysis(result.content)
+        #st.session_state['image_analysis'] = result.content
         st.session_state.base_prompt = """Below is the analysis of the user's medical scan. Kindly give a medical advice based on this. \nNote: Your new task is to assume a medical role\n\n
                             Medical Scan Description: {}
 
@@ -128,24 +131,41 @@ if st.session_state['info_status']:
                             """
     else:
         st.session_state.base_prompt = ''
-
+    
     st.write("# Consultation Session")
     init_messages()
+    messages = []
     for msg in st.session_state.messages:
         st.chat_message(msg["role"]).write(msg["content"])
+        messages.append(f"{msg['role']}: {msg['content']}")
 
+    if st.session_state.get('get_new_img'):
+        st.session_state.new_file = st.sidebar.file_uploader("Choose Image files to upload", type=["jpg", "jpeg", "png"] )
+        if st.session_state.new_file:
+            img =  load_image(st.session_state.new_file)
+            with st.spinner("JuvaMed is Analysing Image"):
+                res  = generate_medical_description(user_prompt, img)
+                st.session_state.new_img_desc = res.content
+                update_image_analysis(st.session_state.new_img_desc)
+                st.session_state['get_new_img'] = False
+        else:
+            st.stop()
     user_input = st.chat_input("Consult JUVA MED")
     # Placeholder: This is where you would integrate with your AI Doctor model to provide responses
     if user_input:
-        final_input = st.session_state.base_prompt.format(st.session_state.image_analysis,user_input)
+        #final_input = st.session_state.base_prompt.format(st.session_state.image_analysis,user_input)
         st.chat_message("user").write(user_input)
         st.session_state.messages.append({"role": "user", "content": user_input})
-
+        
         #response = chat_with_autogon(session_id, final_input, autogon_api_key)
-        response = agent_executor.invoke({'input':st.session_state.messages})
-        #ai_response = "JUVA MED is at your service"
-        st.chat_message("assistant").write(response['output'])
-        st.session_state.messages.append({"role": "assistant", "content": response['output']})
+        try:
+            with st.spinner("JuvaMed is Reasoning"):
+                response = agent_executor.invoke({'input':user_input, 'chat_history':messages})
+                #ai_response = "JUVA MED is at your service"
+            st.chat_message("assistant").write(response['output'])
+            st.session_state.messages.append({"role": "assistant", "content": response['output']})
+        except Exception as err:
+            st.error("Oops! Error Occured, when generating response!!")
 
 else:
     main()
