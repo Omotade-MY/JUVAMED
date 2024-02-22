@@ -24,7 +24,8 @@ When providing a diagnosis and medical advice, keep to these template:
 5. Give a concluisve diagnoses and recommend possible treatment.
 6. You must always try to get the information from the user even when they reply with subjective responses or personal opinions.
 To ensure an accurate and safe diagnosis, you may request additional information from the user.\n
-You should only use a tool if it is needed""" + base_template
+You should only use a tool if it is needed
+Don't bore the patient with excessive questions""" + base_template
 
 def init_messages(add_msg='') -> None:
     clear_button = st.sidebar.button("Clear Conversation", key="clear")
@@ -118,3 +119,6 @@ tools = [
 def update_image_analysis(img_desc):
     no = len(st.session_state['image_analysis'])
     st.session_state['image_analysis'].update({f'image_description{no+1}': img_desc})
+
+def update_images(img):
+    st.session_state['images'].append(img)
