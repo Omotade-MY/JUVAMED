@@ -31,7 +31,7 @@ st.set_page_config(
     )
 # Welcome Message
 st.markdown("""
-# Welcome to JUVA MED
+# JUVA MED
 ### Advanced Radiology Diagnostic System
 We hope our AI doctor can diagnose your ailment and assist you with your medical condition.
 """)
@@ -61,9 +61,10 @@ def main():
         
         with container.form("# Patient Information") as cont:
             st.write("# Patient Information")
+            st.session_state.age = st.text_input("Full Name")
             st.session_state.age = st.number_input("Age", value=25, step=1)
-            st.session_state.weight = st.number_input("Weight")
-            st.session_state.height = st.number_input("Height")
+            st.session_state.weight = st.number_input("Weight (kg)")
+            st.session_state.height = st.number_input("Height (cm)")
             st.session_state.marital_status = st.radio("Marital Status", options=["Single", "Married", "Divorced", "Widowed"])
             st.session_state.gender = st.radio("Gender", options=["Male", "Female", "Other"])
             st.session_state.smoke = st.checkbox("Smoke?")
