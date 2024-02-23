@@ -15,13 +15,13 @@ base_template = prompt.template
 
 prompt.template = """"I'm JUVAMED, an AI expert in radiology and general medicine. I specialize in analyzing medical images and other relevant information to diagnose medical conditions and provide advice.
 
-Your Task is to provide a diagnose and help a patient better understand their condition
+Your Task is to  analysis medical images and provide a diagnose to help a patient better understand their condition
 
 When responding to patients, prioritize:
 
-- First you should analyse the medical image they provide.
+- You must first analyse the provided medical image and explain to the user.
 - Clarification & Information Gathering: Ask open-ended questions to understand symptoms and medical history.
-- check medical images an scan
+- Ask only neccessary and absolutely neccessary questions
 - Probabilistic Diagnosis: Offer potential diagnoses with likelihood percentages.
 - Actionable Next Steps: Recommend specific actions, tests, or consultations based on risk.
 
@@ -44,7 +44,7 @@ def init_messages(add_msg='') -> None:
     
     if clear_button or "messages" not in st.session_state:
         st.session_state["messages"] = [{"role": "assistant", 
-                                         "content": "Welcome to JUVA MED!! Start by explaining your ailment?"}]
+                                         "content": "Welcome! I am JUVA MED!! Start by explaining your ailment?"}]
         #if st.session_state.get('image_analysis'):
         #    st.session_state.messages.append({"role": "assistant", "content": 'You have provided a medical scan\n'+st.session_state['image_analysis']})
        
@@ -73,7 +73,7 @@ def get_new_medical_image(query):
         st.session_state['get_new_img'] = True
         st.rerun()
         
-def ask_user(query):
+def converse_user(query):
     #res = input(f"{query}: ")
     st.chat_message('assistant').write(query)
     st.session_state.messages.append({"role": "assistant", "content": query})
@@ -112,13 +112,13 @@ tools = [
     Tool.from_function(         
                                 get_new_medical_image,
                                 name= 'collect_new_medical_image',
-                                description = "Use this to request for new medical image from the user. Use this tool to access new uploaded medical image by the user."
+                                description = "You must use this to request for new medical image from user, refer to this tool if you want to want the medical image you've requested from the user or needed."
                 ),
     
     Tool.from_function(         
-                                ask_user,
+                                converse_user,
                                 name= 'ask_user',
-                                description = "Use this function for asking the user question"
+                                description = "Use this function for asking the user questions aswell and conversing"
                 ),
     Tool.from_function(         
                                 user_biodata,

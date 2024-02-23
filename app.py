@@ -31,7 +31,7 @@ st.set_page_config(
     )
 # Welcome Message
 st.markdown("""
-# Welcome to JUVA MED
+# JUVA MED
 ### Advanced Radiology Diagnostic System
 We hope our AI doctor can diagnose your ailment and assist you with your medical condition.
 """)
