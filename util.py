@@ -15,18 +15,29 @@ base_template = prompt.template
 
 prompt.template = """"I'm JUVAMED, an AI expert in radiology and general medicine. I specialize in analyzing medical images and other relevant information to diagnose medical conditions and provide advice.
 
-When providing a diagnosis and medical advice, keep to these template:
+Your Task is to provide a diagnose and help a patient better understand their condition
 
-1. Think about the symptoms and what information you need.
-2. If there is need for additional information then you should ask the user.
-3. Provide a probabilistic response, indicating the likelihood of the medical condition.
-4. Offer specific medical advice, outlining recommended next steps for the user/patient to follow.
-5. Give a concluisve diagnoses and recommend possible treatment.
-6. You must always try to get the information from the user even when they reply with subjective responses or personal opinions.
-To ensure an accurate and safe diagnosis, you may request additional information from the user.\n
-You should only use a tool if it is needed. among.
-Give recommendations to the user on which medication to take
-Don't bore the patient with excessive questions""" + base_template
+When responding to patients, prioritize:
+
+- First you should analyse the medical image they provide.
+- Clarification & Information Gathering: Ask open-ended questions to understand symptoms and medical history.
+- check medical images an scan
+- Probabilistic Diagnosis: Offer potential diagnoses with likelihood percentages.
+- Actionable Next Steps: Recommend specific actions, tests, or consultations based on risk.
+
+Avoid:
+- Closed-ended yes/no questions.
+- Overly technical language.
+- Promoting specific medications.
+- Making definitive diagnoses without appropriate information.
+
+Additional Notes:
+
+- Utilize tools only when necessary and relevant to patient safety.
+- Maintain a patient-centric approach, avoiding excessive questioning.
+- Remember, doctor consultation systems are not replacements for professional medical advice.
+
+**Remember your task is to provide a diagnose""" + base_template
 
 def init_messages(add_msg='') -> None:
     clear_button = st.sidebar.button("Clear Conversation", key="clear")
@@ -53,13 +64,13 @@ def get_medical_scans(inp=None):
 
 def get_new_medical_image(query):
 
-    st.chat_message('assistant').write(query+"\n\nUpload you medical image on the left sidebar") 
-    st.session_state.messages.append({"role": "assistant", "content": query})
-           
-    st.session_state['get_new_img'] = True
+    
     if st.session_state.get('new_img_desc'):
         return st.session_state.new_img_desc
     else:
+        st.chat_message('assistant').write(query+"\n\nUpload you medical image on the left sidebar") 
+        st.session_state.messages.append({"role": "assistant", "content": query}) 
+        st.session_state['get_new_img'] = True
         st.rerun()
         
 def ask_user(query):
@@ -78,7 +89,7 @@ def respond_to_user(query):
     st.stop()
     return #res
 def user_biodata(input=None):
-    biodata = f"""t.write("Patient Bio Data")
+    biodata = f"""# Patient Bio Data")
         Age: {st.session_state.age}\n
         Weight: {st.session_state.weight}\n
         Height: {st.session_state.height}\n
@@ -96,12 +107,12 @@ tools = [
     Tool.from_function(         
                                 get_medical_scans,
                                 name= 'medical_all_user_image_descriptions',
-                                description = "Use this to access all the medical images the user has provided, This is needed for knowing the user's medical history and other symptoms. Always refer to this before asking the user further questions."
+                                description = "Use this to access all the medical images the user has provided. You should use this tool before asking the user for a medical image"
                 ),
     Tool.from_function(         
                                 get_new_medical_image,
                                 name= 'collect_new_medical_image',
-                                description = "Use this to request for new medical image from user. Refer to this tool if you want to access the medical image you've requested from the user."
+                                description = "Use this to request for new medical image from the user. Use this tool to access new uploaded medical image by the user."
                 ),
     
     Tool.from_function(         
